@@ -19,5 +19,7 @@
 module Ohai
   module Exceptions
     class Exec < RuntimeError; end
+    class ExecMissing < Exec; end
+    class SkipPlugin < RuntimeError; end
   end
 end

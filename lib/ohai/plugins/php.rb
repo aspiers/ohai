@@ -24,7 +24,12 @@ output = nil
 
 php = Mash.new
 
-status, stdout, stderr = run_command(:no_status_check => true, :command => "php -v")
+begin
+  status, stdout, stderr = run_command(:no_status_check => true, :command => "php -v")
+rescue Ohai::Exceptions::ExecMissing
+  raise Ohai::Exceptions::SkipPlugin, $!.message
+end
+
 if status == 0
   output = stdout.split
   if output.length >= 6

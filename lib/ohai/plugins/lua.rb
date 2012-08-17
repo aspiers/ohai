@@ -24,7 +24,12 @@ output = nil
 
 lua = Mash.new
 
-status, stdout, stderr = run_command(:no_status_check => true, :command => "lua -v")
+begin
+  status, stdout, stderr = run_command(:no_status_check => true, :command => "lua -v")
+rescue Ohai::Exceptions::ExecMissing
+  raise Ohai::Exceptions::SkipPlugin, $!.message
+end
+
 if status == 0
   output = stderr.split
   if output.length >= 1
