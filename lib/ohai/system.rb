@@ -210,18 +210,29 @@ module Ohai
       Ohai::Config[:plugin_path].each do |path|
         check_path = File.expand_path(File.join(path, filename))
         begin
-          @seen_plugins[plugin_name] = true
+          if ! File.exists?(check_path)
+            Ohai::Log.debug("No #{plugin_name} at #{check_path}")
+            next
+          end
+          if ! File.readable?(check_path)
+            Ohai::Log.debug("#{plugin_name} found #{check_path}")
+            next
+          end
           Ohai::Log.debug("Loading plugin #{plugin_name}")
           from_file(check_path)
+          Ohai::Log.debug("Successfully loaded plugin #{plugin_name}")
+          @seen_plugins[plugin_name] = true
           return true
-        rescue Errno::ENOENT => e
-          Ohai::Log.debug("No #{plugin_name} at #{check_path}")
         rescue SystemExit, Interrupt
+          # These are the only two classes of exception we don't want to catch
           raise
-        rescue Exception,Errno::ENOENT => e
-          Ohai::Log.debug("Plugin #{plugin_name} threw exception #{e.inspect} #{e.backtrace.join("\n")}")
+        rescue Exception => e
+          Ohai::Log.error("Plugin #{plugin_name} threw exception #{e.inspect}")
+          Ohai::Log.debug(e.backtrace.join("\n"))
         end
       end
+
+      return false
     end
 
     # Sneaky!  Lets us stub out require_plugin when testing plugins, but still
