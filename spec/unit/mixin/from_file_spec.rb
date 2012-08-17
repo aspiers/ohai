@@ -26,16 +26,6 @@ describe Ohai::System, "from_file" do
     IO.stub!(:read).and_return("king 'herod'")
   end
   
-  it "should check to see that the file exists" do
-    File.should_receive(:exists?).and_return(true)
-    @ohai.from_file("/tmp/foo")
-  end
-  
-  it "should check to see that the file is readable" do
-    File.should_receive(:readable?).and_return(true)
-    @ohai.from_file("/tmp/foo")
-  end
-  
   it "should actually read the file" do
     IO.should_receive(:read).and_return("king 'herod'")
     @ohai.from_file("/tmp/foo")
@@ -47,7 +37,7 @@ describe Ohai::System, "from_file" do
   end
   
   it "should raise an IOError if it cannot read the file" do
-    File.stub!(:exists?).and_return(false)
-    lambda { @ohai.from_file("/tmp/foo") }.should raise_error(IOError)
+    IO.stub!(:read).and_raise(Errno::ENOENT)
+    lambda { @ohai.from_file("/tmp/foo") }.should raise_error(Errno::ENOENT)
   end
 end

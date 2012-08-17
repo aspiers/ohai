@@ -338,7 +338,8 @@ module Ohai
           [cid, pw.last, pr.first, pe.first]
         end
       rescue Errno::ENOENT
-        raise Ohai::Exceptions::Exec, "command #{cmd} doesn't exist or is not in the PATH"
+        raise Ohai::Exceptions::ExecMissing, \
+          "command #{cmd} doesn't exist or is not in the PATH"
       ensure
 	# we disabled GC entering
 	GC.enable

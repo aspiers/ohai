@@ -224,12 +224,14 @@ module Ohai
           Ohai::Log.debug("Successfully loaded plugin #{plugin_name}")
           @seen_plugins[plugin_name] = true
           return true
+        rescue Ohai::Exceptions::SkipPlugin => e
+          Ohai::Log.info("Plugin #{plugin_name} skipped: #{e.message}")
         rescue SystemExit, Interrupt
           # These are the only two classes of exception we don't want to catch
           raise
         rescue Exception => e
-          Ohai::Log.error("Plugin #{plugin_name} threw exception #{e.inspect}")
-          Ohai::Log.debug(e.backtrace.join("\n"))
+          Ohai::Log.error("Plugin #{plugin_name} failed: #{e.message} (#{e.class})")
+          Ohai::Log.error(e.backtrace.join("\n"))
         end
       end
 

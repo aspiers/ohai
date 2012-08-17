@@ -25,7 +25,12 @@ require_plugin "languages"
 c = Mash.new
 
 #gcc
-status, stdout, stderr = run_command(:no_status_check => true, :command => "gcc -v")
+begin
+  status, stdout, stderr = run_command(:no_status_check => true, :command => "gcc -v")
+rescue Ohai::Exceptions::ExecMissing
+  raise Ohai::Exceptions::SkipPlugin, $!.message
+end
+
 if status == 0
   description = stderr.split($/).last
   output = description.split

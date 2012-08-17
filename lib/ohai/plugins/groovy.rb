@@ -24,7 +24,12 @@ output = nil
 
 groovy = Mash.new
 
-status, stdout, stderr = run_command(:no_status_check => true, :command => "groovy -v")
+begin
+  status, stdout, stderr = run_command(:no_status_check => true, :command => "groovy -v")
+rescue Ohai::Exceptions::ExecMissing
+  raise Ohai::Exceptions::SkipPlugin, $!.message
+end
+
 if status == 0
   output = stdout.split
   if output.length >= 2
