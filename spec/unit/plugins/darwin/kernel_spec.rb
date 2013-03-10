@@ -23,6 +23,12 @@ describe Ohai::System, "Darwin kernel plugin" do
   before(:each) do
     @ohai = Ohai::System.new    
     @ohai.stub!(:require_plugin).and_return(true)
+    stdin  = double("stdin")
+    stdout = double("stdout")
+    stderr = double("stderr")
+    stdin .stub!(:close)
+    stdout.stub!(:each)  .and_yield("foo")
+    @ohai.stub!(:popen4).with('kextstat -k -l').and_yield(12345, stdin, stdout, stderr)
     @ohai[:kernel] = Mash.new
     @ohai[:kernel][:name] = "darwin"
   end
